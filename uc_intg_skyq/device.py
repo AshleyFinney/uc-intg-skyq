@@ -23,6 +23,24 @@ from uc_intg_skyq.const import (
 _LOG = logging.getLogger(__name__)
 
 
+def _format_uptime(seconds: object) -> str:
+    """Sky Q's systemUptime is reported in seconds. Render it as 'Xd Yh Zm' / 'Xh Ym' / 'Xm'."""
+    try:
+        total = int(seconds)
+    except (TypeError, ValueError):
+        return ""
+    if total <= 0:
+        return ""
+    days, rem = divmod(total, 86400)
+    hours, rem = divmod(rem, 3600)
+    minutes = rem // 60
+    if days:
+        return f"{days}d {hours}h {minutes}m"
+    if hours:
+        return f"{hours}h {minutes}m"
+    return f"{minutes}m"
+
+
 class SkyQDevice(PollingDevice):
     """SkyQ satellite box managed via HTTP polling."""
 
@@ -350,7 +368,7 @@ class SkyQDevice(PollingDevice):
             self._software_version = str(info.get("ASVersion", "") or "")
             self._hdr_capable = str(info.get("hdrCapable", "") or "")
             self._uhd_capable = str(info.get("uhdCapable", "") or "")
-            self._system_uptime = str(info.get("systemUptime", "") or "")
+            self._system_uptime = _format_uptime(info.get("systemUptime"))
         else:
             model = getattr(info, "modelName", None) or getattr(info, "hardwareModel", "SkyQ")
             device_name = getattr(info, "deviceName", "")
@@ -358,7 +376,7 @@ class SkyQDevice(PollingDevice):
             self._software_version = str(getattr(info, "ASVersion", "") or "")
             self._hdr_capable = str(getattr(info, "hdrCapable", "") or "")
             self._uhd_capable = str(getattr(info, "uhdCapable", "") or "")
-            self._system_uptime = str(getattr(info, "systemUptime", "") or "")
+            self._system_uptime = _format_uptime(getattr(info, "systemUptime", None))
         self._model = model or "SkyQ"
         if device_name and device_name.strip():
             self._device_name = device_name.strip()
