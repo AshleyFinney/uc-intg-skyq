@@ -58,6 +58,7 @@ class _SkyQSelectBase(SelectEntity):
             cmd_handler=self._handle_command,
         )
         self.subscribe_to_device(device)
+        _LOG.info("[%s] Constructed and subscribed to device", entity_id)
 
     async def _fetch_options(self) -> list[str]:
         raise NotImplementedError
@@ -66,6 +67,12 @@ class _SkyQSelectBase(SelectEntity):
         raise NotImplementedError
 
     async def sync_state(self) -> None:
+        _LOG.info(
+            "[%s] sync_state called (device.state=%s, cached options=%d)",
+            self.id,
+            self._device.state,
+            len(self.select_options or []),
+        )
         if self._device.state == DeviceState.UNAVAILABLE:
             self.set_state(select.States.UNAVAILABLE, update=True)
             return
@@ -77,12 +84,13 @@ class _SkyQSelectBase(SelectEntity):
                 _LOG.warning("[%s] Failed to fetch options: %s", self.id, err)
                 self.set_state(select.States.UNKNOWN, update=True)
                 return
-            _LOG.info("[%s] Loaded %d options", self.id, len(options))
+            _LOG.info("[%s] Loaded %d options from device", self.id, len(options))
         # Always push state+options so a newly-configured entity gets data on
         # the next poll cycle (the framework no-ops update for unconfigured
         # entities, so the local cache could otherwise stay stuck on the
         # Remote even after the user adds the widget).
         self.set_attributes(state=select.States.ON, options=options, update=True)
+        _LOG.info("[%s] Pushed %d options to Remote", self.id, len(options))
 
     async def _handle_command(
         self,
