@@ -14,6 +14,11 @@ import aiohttp
 
 from uc_intg_skyq.const import SKYQ_API_TIMEOUT, SKYQ_DIGIT_DELAY, SKYQ_SELECT_DELAY
 
+try:
+    from pyskyqremote.const import COMMANDS as _PYSKYQ_COMMANDS
+except ImportError:
+    _PYSKYQ_COMMANDS = None
+
 _LOG = logging.getLogger(__name__)
 
 
@@ -190,6 +195,12 @@ class SkyQClient:
 
     async def send_remote_command(self, command: str) -> bool:
         if self._skyq_remote and self._skyq_remote.device_setup:
+            if _PYSKYQ_COMMANDS is not None and command not in _PYSKYQ_COMMANDS:
+                _LOG.warning(
+                    "Command '%s' has no IRCC code in pyskyqremote — Sky Q may not "
+                    "expose it. Skipping.", command,
+                )
+                return False
             try:
                 result = await asyncio.get_event_loop().run_in_executor(
                     None, self._skyq_remote.press, command

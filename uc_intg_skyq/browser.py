@@ -82,7 +82,7 @@ async def search(device: SkyQDevice, options: SearchOptions) -> SearchResults | 
                 media_class=MediaClass.VIDEO,
                 media_type=MediaContentType.VIDEO,
                 media_id=f"recording_{pvrid}",
-                can_play=True,
+                can_play=False,
                 thumbnail=getattr(rec, "image_url", None),
                 subtitle=subtitle,
             ))
@@ -238,7 +238,7 @@ async def _browse_recordings(device: SkyQDevice, options: BrowseOptions) -> Brow
             media_class=MediaClass.VIDEO,
             media_type=MediaContentType.VIDEO,
             media_id=f"recording_{pvrid}",
-            can_play=True,
+            can_play=False,
             thumbnail=getattr(rec, "image_url", None),
             subtitle=subtitle,
         ))
