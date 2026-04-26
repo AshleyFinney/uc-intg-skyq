@@ -69,15 +69,19 @@ class _SkyQSelectBase(SelectEntity):
         if self._device.state == DeviceState.UNAVAILABLE:
             self.set_state(select.States.UNAVAILABLE, update=True)
             return
-        if self.select_options:
-            self.set_state(select.States.ON, update=True)
-            return
-        try:
-            options = await self._fetch_options()
-        except Exception as err:
-            _LOG.warning("[%s] Failed to fetch options: %s", self.id, err)
-            self.set_state(select.States.UNKNOWN, update=True)
-            return
+        options = self.select_options
+        if not options:
+            try:
+                options = await self._fetch_options()
+            except Exception as err:
+                _LOG.warning("[%s] Failed to fetch options: %s", self.id, err)
+                self.set_state(select.States.UNKNOWN, update=True)
+                return
+            _LOG.info("[%s] Loaded %d options", self.id, len(options))
+        # Always push state+options so a newly-configured entity gets data on
+        # the next poll cycle (the framework no-ops update for unconfigured
+        # entities, so the local cache could otherwise stay stuck on the
+        # Remote even after the user adds the widget).
         self.set_attributes(state=select.States.ON, options=options, update=True)
 
     async def _handle_command(
