@@ -37,25 +37,13 @@ For the full commit log including internal cleanups, see [the main branch](https
 
 ## Features
 
-This integration provides full remote control of your SkyQ satellite boxes directly from your Unfolded Circle Remote, with automatic multi-device detection and comprehensive remote functionality. **Production Ready**: Tested and verified working with real SkyQ devices across multiple households.
-
----
-## ❤️ Support Development ❤️
-
-If you find this integration useful, consider supporting development:
-
-[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-pink?style=for-the-badge&logo=github)](https://github.com/sponsors/mase1981)
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/meirmiyara)
-[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/mmiyara)
-
-Your support helps maintain this integration. Thank you! ❤️
----
+This integration provides full remote control of your Sky Q satellite box directly from your Unfolded Circle Remote, with automatic multi-device detection and comprehensive remote functionality. This fork is used daily on a Sky Q **ES240** — no other variants have been tested by the fork maintainer.
 
 ### 📺 **Multi-Device Support**
 
-- **Multi-Device Setup** - Configure up to 10 SkyQ devices in a single integration
-- **Smart Naming** - Automatic entity naming using real device information (model, serial, location)
-- **Device Models** - Supports all SkyQ models (ES130, ES200, etc.) with model-specific naming
+- **Multi-Device Setup** - Configure up to 10 Sky Q devices in a single integration
+- **Smart Naming** - Automatic entity naming using device information returned by the box
+- **Single Tested Model** - This fork is only tested on **ES240**. The upstream integration supports other variants (ES130, ES200, etc.) — use it instead if you have one of those.
 
 #### **Per-Device Entities**
 Each SkyQ device creates one remote entity:
@@ -99,11 +87,11 @@ Real SkyQ protocol implementation with confirmed working buttons:
 
 ### **Device Requirements**
 
-#### **SkyQ Device Compatibility**
-- **SkyQ Models**: All SkyQ satellite boxes (ES130, ES200, etc.)
-- **Firmware**: Any current SkyQ firmware version
-- **Network**: Ethernet or Wi-Fi connected SkyQ device
-- **API Access**: Standard SkyQ HTTP and TCP remote protocols (enabled by default)
+#### **Sky Q Device Compatibility**
+- **Tested Model**: Sky Q **ES240** (UK). The integration may work on other Sky Q variants (ES130, ES200, etc.) since the protocol is shared, but no other models are tested or supported by this fork — use the [upstream project](https://github.com/mase1981/uc-intg-skyq) for broader compatibility.
+- **Firmware**: Any current Sky Q firmware version
+- **Network**: Ethernet or Wi-Fi connected Sky Q device
+- **API Access**: Standard Sky Q HTTP and TCP remote protocols (enabled by default)
 
 ### **Protocol Requirements**
 
@@ -243,13 +231,14 @@ This project is licensed under the Mozilla Public License 2.0 (MPL-2.0) - see LI
 
 ## Support & Community
 
-- **GitHub Issues**: [Report bugs and request features](https://github.com/mase1981/uc-intg-skyq/issues)
+- **Fork Issues** (ES240-specific bugs in this fork): [AshleyFinney/uc-intg-skyq/issues](https://github.com/AshleyFinney/uc-intg-skyq/issues)
+- **Upstream Issues** (anything affecting non-ES240 boxes, or general bugs): [mase1981/uc-intg-skyq/issues](https://github.com/mase1981/uc-intg-skyq/issues)
 - **UC Community Forum**: [General discussion and support](https://unfolded.community/)
-- **Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara)
+- **Original Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara) — please direct thanks and donations to him, not the fork
 - **Sky Support**: [Official Sky Support](https://www.sky.com/help)
 
 ---
 
-**Made with ❤️ for the Unfolded Circle and SkyQ Communities**
+**Made with ❤️ for the Unfolded Circle and Sky Q communities**
 
-**Thank You**: Meir Miyara
+**Original work and ongoing thanks to**: Meir Miyara
