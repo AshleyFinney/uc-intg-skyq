@@ -19,6 +19,7 @@ from ucapi_framework import MediaPlayerEntity, MediaPlayerAttributes
 
 from uc_intg_skyq import browser
 from uc_intg_skyq.config import SkyQDeviceConfig
+from uc_intg_skyq.const import DeviceState
 from uc_intg_skyq.device import SkyQDevice
 
 _LOG = logging.getLogger(__name__)
@@ -149,3 +150,61 @@ class SkyQMediaPlayer(MediaPlayerEntity):
 
         _LOG.warning("[%s] Unknown media_id: %s", self.id, media_id)
         return False
+
+
+class SkyQRecordingsBrowser(MediaPlayerEntity):
+    """Recordings-only MediaPlayer that opens straight into the rich browse view.
+
+    Trade-off: ucapi has no "browse button" entity, so we register a slim
+    secondary MediaPlayer scoped to recordings — series collapse into folders
+    via browser.browse_recordings_root. Only BROWSE_MEDIA / SEARCH_MEDIA are
+    advertised; playback routing stays on the main media_player.
+    """
+
+    def __init__(self, device_config: SkyQDeviceConfig, device: SkyQDevice) -> None:
+        self._device = device
+        entity_id = f"media_player.skyq_{device_config.identifier}.recordings"
+
+        super().__init__(
+            entity_id,
+            f"{device_config.name} Recordings",
+            features=[
+                media_player.Features.BROWSE_MEDIA,
+                media_player.Features.SEARCH_MEDIA,
+            ],
+            attributes={
+                media_player.Attributes.STATE: media_player.States.UNAVAILABLE,
+                media_player.Attributes.MEDIA_TYPE: "VIDEO",
+            },
+            device_class=media_player.DeviceClasses.SET_TOP_BOX,
+            cmd_handler=self._handle_command,
+        )
+        self.subscribe_to_device(device)
+
+    async def sync_state(self) -> None:
+        state = (
+            media_player.States.UNAVAILABLE
+            if self._device.state == DeviceState.UNAVAILABLE
+            else media_player.States.ON
+        )
+        self.update(
+            {
+                media_player.Attributes.STATE: state,
+                media_player.Attributes.MEDIA_TYPE: "VIDEO",
+            }
+        )
+
+    async def browse(self, options: BrowseOptions) -> BrowseResults | StatusCodes:
+        return await browser.browse_recordings_root(self._device, options)
+
+    async def search(self, options: SearchOptions) -> SearchResults | StatusCodes:
+        return await browser.search_recordings(self._device, options)
+
+    async def _handle_command(
+        self,
+        entity: media_player.MediaPlayer,
+        cmd_id: str,
+        params: dict[str, Any] | None,
+    ) -> StatusCodes:
+        _LOG.debug("[%s] Command: %s params=%s", self.id, cmd_id, params)
+        return StatusCodes.NOT_IMPLEMENTED

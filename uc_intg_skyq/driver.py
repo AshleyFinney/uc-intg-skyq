@@ -13,10 +13,14 @@ from ucapi_framework import BaseIntegrationDriver
 
 from uc_intg_skyq.config import SkyQDeviceConfig
 from uc_intg_skyq.device import SkyQDevice
-from uc_intg_skyq.media_player import SkyQMediaPlayer
+from uc_intg_skyq.media_player import SkyQMediaPlayer, SkyQRecordingsBrowser
 from uc_intg_skyq.remote import SkyQRemote
+# SkyQAppsSelect is intentionally NOT imported/registered here. Sky Q has no
+# programmatic app-launch path (verified against pyskyqremote, skyq-ha,
+# pyskyq-bradwood, sky-remote-archerjm, go-skyremote, alexa-sky-hd, plus a
+# direct probe of /as/apps/* — every endpoint returned 404). The class is
+# kept in select.py only as a record of what was tried.
 from uc_intg_skyq.select import (
-    SkyQAppsSelect,
     SkyQChannelsSelect,
     SkyQFavouritesSelect,
     SkyQRadioSelect,
@@ -53,6 +57,7 @@ class SkyQDriver(BaseIntegrationDriver[SkyQDevice, SkyQDeviceConfig]):
             device_class=SkyQDevice,
             entity_classes=[
                 SkyQMediaPlayer,
+                SkyQRecordingsBrowser,
                 SkyQRemote,
                 SkyQModelSensor,
                 SkyQIPAddressSensor,
@@ -64,7 +69,6 @@ class SkyQDriver(BaseIntegrationDriver[SkyQDevice, SkyQDeviceConfig]):
                 SkyQUhdCapableSensor,
                 SkyQUptimeSensor,
                 SkyQMediaKindSensor,
-                SkyQAppsSelect,
                 SkyQChannelsSelect,
                 SkyQFavouritesSelect,
                 SkyQRadioSelect,
