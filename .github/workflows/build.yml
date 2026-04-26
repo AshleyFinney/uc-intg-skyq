@@ -1,5 +1,5 @@
-# Triggered by version tag creation to build a distribution binary, Docker image, and create a release draft
-name: "Build & Draft Release"
+# Triggered by version tag creation to build a distribution binary, Docker image, and publish a release
+name: "Build & Release"
 
 "on":
   push:
@@ -143,11 +143,11 @@ jobs:
         run: |
           for filename in *.tar.gz; do echo "sha256  `sha256sum $filename`" >> ${{needs.build.outputs.driver_id}}.hash; done;
 
-      - name: Create release draft
+      - name: Publish release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "*.tar.gz,${{needs.build.outputs.driver_id}}.hash"
-          draft: true
+          draft: false
           generateReleaseNotes: true
           artifactErrorsFailBuild: true
           tag: v${{needs.build.outputs.version}}
