@@ -258,8 +258,7 @@ This project is licensed under the Mozilla Public License 2.0 (MPL-2.0) - see LI
 
 ## Support & Community
 
-- **Fork Issues** (ES240-specific bugs in this fork): [AshleyFinney/uc-intg-skyq/issues](https://github.com/AshleyFinney/uc-intg-skyq/issues)
-- **Upstream Issues** (anything affecting non-ES240 boxes, or general bugs): [mase1981/uc-intg-skyq/issues](https://github.com/mase1981/uc-intg-skyq/issues)
+- **Issues / Bug Reports**: [AshleyFinney/uc-intg-skyq/issues](https://github.com/AshleyFinney/uc-intg-skyq/issues)
 - **UC Community Forum**: [General discussion and support](https://unfolded.community/)
 - **Original Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara) — please direct thanks and donations to them, not the fork
 - **Sky Support**: [Official Sky Support](https://www.sky.com/help)
