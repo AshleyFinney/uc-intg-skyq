@@ -3,16 +3,37 @@
 Control your SkyQ satellite boxes directly from your Unfolded Circle Remote 2 or Remote 3 with comprehensive remote control functionality, **multi-device support**, and **real-time status monitoring**.
 
 ![SkyQ](https://img.shields.io/badge/SkyQ-Satellite%20TV-blue)
-[![GitHub Release](https://img.shields.io/github/v/release/mase1981/uc-intg-skyq?style=flat-square)](https://github.com/mase1981/uc-intg-skyq/releases)
 ![License](https://img.shields.io/badge/license-MPL--2.0-blue?style=flat-square)
-[![GitHub issues](https://img.shields.io/github/issues/mase1981/uc-intg-skyq?style=flat-square)](https://github.com/mase1981/uc-intg-skyq/issues)
-[![Community Forum](https://img.shields.io/badge/community-forum-blue?style=flat-square)](https://unfolded.community/)
-[![Discord](https://badgen.net/discord/online-members/zGVYf58)](https://discord.gg/zGVYf58)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/mase1981/uc-intg-skyq/total?style=flat-square)
-[![Buy Me A Coffee](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg?style=flat-square)](https://buymeacoffee.com/meirmiyara)
-[![PayPal](https://img.shields.io/badge/PayPal-donate-blue.svg?style=flat-square)](https://paypal.me/mmiyara)
-[![Github Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?&logo=GitHub-Sponsors&logoColor=EA4AAA&style=flat-square)](https://github.com/sponsors/mase1981)
 
+---
+
+## ⚠️ Personal Fork Notice
+
+This is a **personal fork** of [mase1981/uc-intg-skyq](https://github.com/mase1981/uc-intg-skyq), maintained for use on a single Sky Q **ES240** box. **Other Sky Q variants are explicitly not supported by this fork** — for broader hardware support, please use the upstream project instead.
+
+All credit for the original implementation goes to **[Meir Miyara](https://www.linkedin.com/in/meirmiyara)**, who built and continues to maintain the upstream integration. He's done a fantastic job creating it without owning a Sky Q box of his own — please [support his work](https://buymeacoffee.com/meirmiyara) if you find this integration useful:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Meir%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/meirmiyara)
+[![PayPal](https://img.shields.io/badge/PayPal%20Meir-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/mmiyara)
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor%20Meir-GitHub-pink?style=for-the-badge&logo=github)](https://github.com/sponsors/mase1981)
+
+The upstream project is welcome to reference any changes in this fork.
+
+---
+
+## Differences from upstream
+
+User-facing fixes and improvements in this fork:
+
+- **Digit buttons no longer send commands twice.** Pressing a number on a custom UI page used to send the digit immediately and then again ~2 seconds later, causing the box to re-tune to the same channel and triggering a phantom `OK` press at the end.
+- **Concurrent channel changes are now safe.** Two `channel_select:` activations firing close together (button mash, multiple activities firing in parallel) used to interleave their digit sequences and tune to an unpredictable channel; they're now serialized.
+- **Channel changes no longer block the UI.** The post-change state refresh runs in the background, so channel-up/down and `channel_select:` button presses feel snappier.
+- **Faster media browsing.** Channels, favourites, and recordings now load in parallel instead of sequentially.
+- **Radio channels show their "Radio" subtitle correctly.** The on-screen marker for radio stations was broken on all paths; it now appears as intended.
+
+For the full commit log including internal cleanups, see [the main branch](https://github.com/AshleyFinney/uc-intg-skyq/commits/main).
+
+---
 
 ## Features
 
@@ -102,23 +123,25 @@ Real SkyQ protocol implementation with confirmed working buttons:
 ## Installation
 
 ### Option 1: Remote Web Interface (Recommended)
-1. Navigate to the [**Releases**](https://github.com/mase1981/uc-intg-skyq/releases) page
+1. Navigate to the [**Fork Releases**](https://github.com/AshleyFinney/uc-intg-skyq/releases) page
 2. Download the latest `uc-intg-skyq-<version>-aarch64.tar.gz` file
 3. Open your remote's web interface (`http://your-remote-ip`)
 4. Go to **Settings** → **Integrations** → **Add Integration**
 5. Click **Upload** and select the downloaded `.tar.gz` file
 
+> Prefer the upstream build? Use [mase1981/uc-intg-skyq's releases](https://github.com/mase1981/uc-intg-skyq/releases) instead — recommended if you don't have an ES240.
+
 ### Option 2: Docker (Advanced Users)
 
-The integration is available as a pre-built Docker image from GitHub Container Registry:
+The fork publishes a pre-built Docker image as a side effect of the release workflow:
 
-**Image**: `ghcr.io/mase1981/uc-intg-skyq:latest`
+**Image**: `ghcr.io/ashleyfinney/uc-intg-skyq:latest`
 
 **Docker Compose:**
 ```yaml
 services:
   uc-intg-skyq:
-    image: ghcr.io/mase1981/uc-intg-skyq:latest
+    image: ghcr.io/ashleyfinney/uc-intg-skyq:latest
     container_name: uc-intg-skyq
     network_mode: host
     volumes:
@@ -133,7 +156,7 @@ services:
 
 **Docker Run:**
 ```bash
-docker run -d --name uc-skyq --restart unless-stopped --network host -v skyq-config:/app/config -e UC_CONFIG_HOME=/app/config -e UC_INTEGRATION_INTERFACE=0.0.0.0 -e UC_INTEGRATION_HTTP_PORT=9090 -e PYTHONPATH=/app ghcr.io/mase1981/uc-intg-skyq:latest
+docker run -d --name uc-skyq --restart unless-stopped --network host -v skyq-config:/app/config -e UC_CONFIG_HOME=/app/config -e UC_INTEGRATION_INTERFACE=0.0.0.0 -e UC_INTEGRATION_HTTP_PORT=9090 -e PYTHONPATH=/app ghcr.io/ashleyfinney/uc-intg-skyq:latest
 ```
 
 ## Configuration
@@ -206,12 +229,13 @@ When using multiple devices:
 
 ## Credits
 
-- **Developer**: Meir Miyara
+- **Original Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara) — created and maintains the upstream integration that this fork is based on. All architectural credit goes to him; this fork only carries small fixes and quality-of-life changes specific to ES240 use. Please [support his work](https://buymeacoffee.com/meirmiyara) if this integration is useful to you.
+- **Upstream Project**: [mase1981/uc-intg-skyq](https://github.com/mase1981/uc-intg-skyq) — the source of this fork
 - **SkyQ**: Sky satellite TV platform
 - **Unfolded Circle**: Remote 2/3 integration framework (ucapi)
-- **pyskyqremote**: Python library for SkyQ control
+- **pyskyqremote**: Python library for SkyQ control by [Roger Selwyn](https://github.com/RogerSelwyn)
 - **Protocol**: SkyQ HTTP API + TCP Remote Control
-- **Community**: Testing and feedback from UC community
+- **Community**: Testing and feedback from the UC community
 
 ## License
 
