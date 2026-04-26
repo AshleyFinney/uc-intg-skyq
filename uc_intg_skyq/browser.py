@@ -166,7 +166,7 @@ async def _browse_channels(device: SkyQDevice, options: BrowseOptions) -> Browse
             media_id=f"channel_{ch_no}",
             can_play=True,
             thumbnail=getattr(ch, "channelimageurl", None),
-            subtitle="Radio" if ch_type == "audio" else "",
+            subtitle="Radio" if ch_type == "audio" else None,
         ))
 
     return BrowseResults(
@@ -256,7 +256,7 @@ async def _browse_recordings(device: SkyQDevice, options: BrowseOptions) -> Brow
     )
 
 
-def _format_season_episode(season: int | None, episode: int | None, channel: str = "") -> str:
+def _format_season_episode(season: int | None, episode: int | None, channel: str = "") -> str | None:
     parts = []
     if season and episode:
         parts.append(f"S{season:02d}E{episode:02d}")
@@ -266,4 +266,4 @@ def _format_season_episode(season: int | None, episode: int | None, channel: str
         parts.append(f"Episode {episode}")
     if channel:
         parts.append(channel)
-    return " | ".join(parts)
+    return " | ".join(parts) if parts else None
