@@ -296,7 +296,7 @@ class SkyQClient:
                     if resp.status == 200:
                         data = await resp.json()
                         services = data.get("services", [])
-                        return [_HttpChannel(s) for s in services if s.get("t") == "1"]
+                        return [_HttpChannel(s) for s in services]
         except Exception as err:
             _LOG.debug("HTTP channel list failed: %s", err)
         return []
@@ -309,5 +309,5 @@ class _HttpChannel:
         self.channelno = data.get("c", "")
         self.channelname = data.get("t", "") or data.get("title", "")
         self.channelimageurl = None
-        self.channeltype = "Radio" if data.get("sf") == "au" else ""
+        self.channeltype = "audio" if data.get("sf") == "au" else "video"
         self.sid = data.get("sid", "")

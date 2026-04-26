@@ -166,7 +166,7 @@ async def _browse_channels(device: SkyQDevice, options: BrowseOptions) -> Browse
             media_id=f"channel_{ch_no}",
             can_play=True,
             thumbnail=getattr(ch, "channelimageurl", None),
-            subtitle="Radio" if ch_type == "Radio" else "",
+            subtitle="Radio" if ch_type == "audio" else "",
         ))
 
     return BrowseResults(
