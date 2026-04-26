@@ -14,6 +14,7 @@ from ucapi_framework import DeviceEvents, PollingDevice
 from uc_intg_skyq.client import SkyQClient
 from uc_intg_skyq.config import SkyQDeviceConfig
 from uc_intg_skyq.const import (
+    DeviceState,
     SKYQ_CONNECT_RETRIES,
     SKYQ_CONNECT_RETRY_DELAY,
     SKYQ_POLL_INTERVAL,
@@ -30,7 +31,7 @@ class SkyQDevice(PollingDevice):
         self._device_config = device_config
         self._client: SkyQClient | None = None
 
-        self._state: str = "UNAVAILABLE"
+        self._state: DeviceState = DeviceState.UNAVAILABLE
         self._media_title: str = ""
         self._media_image_url: str = ""
 
@@ -91,7 +92,7 @@ class SkyQDevice(PollingDevice):
         except ConnectionError:
             _LOG.warning("[%s] Initial state query failed, continuing with defaults", self.log_id)
 
-        self._state = "ON"
+        self._state = DeviceState.ON
         _LOG.info("[%s] Connected via %s", self.log_id, self._connection_type)
         return self._client
 
@@ -103,21 +104,21 @@ class SkyQDevice(PollingDevice):
             self.push_update()
         except Exception as err:
             _LOG.debug("[%s] Poll error: %s", self.log_id, err)
-            if self._state != "UNAVAILABLE":
-                self._state = "UNAVAILABLE"
+            if self._state != DeviceState.UNAVAILABLE:
+                self._state = DeviceState.UNAVAILABLE
                 self.events.emit(DeviceEvents.DISCONNECTED, self.identifier)
 
     async def disconnect(self) -> None:
         if self._client:
             await self._client.disconnect()
             self._client = None
-        self._state = "UNAVAILABLE"
+        self._state = DeviceState.UNAVAILABLE
         await super().disconnect()
 
     # -- State properties ------------------------------------------------------
 
     @property
-    def state(self) -> str:
+    def state(self) -> DeviceState:
         return self._state
 
     @property
@@ -153,13 +154,13 @@ class SkyQDevice(PollingDevice):
         if is_standby is True:
             result = await self._client.send_remote_command("power")
             if result:
-                self._state = "ON"
+                self._state = DeviceState.ON
                 await asyncio.sleep(6)
                 await self._update_player_state()
                 self.push_update()
             return result
         if is_standby is False:
-            self._state = "ON"
+            self._state = DeviceState.ON
             self.push_update()
             return True
         return await self._client.send_remote_command("power")
@@ -171,13 +172,13 @@ class SkyQDevice(PollingDevice):
         if is_standby is False:
             result = await self._client.send_remote_command("power")
             if result:
-                self._state = "OFF"
+                self._state = DeviceState.OFF
                 self._media_title = ""
                 self._media_image_url = ""
                 self.push_update()
             return result
         if is_standby is True:
-            self._state = "OFF"
+            self._state = DeviceState.OFF
             self.push_update()
             return True
         return await self._client.send_remote_command("power")
@@ -312,13 +313,13 @@ class SkyQDevice(PollingDevice):
             raise ConnectionError("Cannot reach device")
 
         if is_standby:
-            self._state = "OFF"
+            self._state = DeviceState.OFF
             self._media_title = ""
             self._media_image_url = ""
             self._current_channel = ""
             return
 
-        self._state = "PLAYING"
+        self._state = DeviceState.PLAYING
 
         program = await self._client.get_current_program()
         if program:

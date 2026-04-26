@@ -5,6 +5,16 @@ Constants for SkyQ integration.
 :license: MPL-2.0, see LICENSE for more details.
 """
 
+from enum import StrEnum
+
+
+class DeviceState(StrEnum):
+    UNAVAILABLE = "UNAVAILABLE"
+    ON = "ON"
+    OFF = "OFF"
+    PLAYING = "PLAYING"
+
+
 SKYQ_DEFAULT_REST_PORT = 8080
 SKYQ_ALT_REST_PORT = 9006
 SKYQ_REMOTE_PORT = 49160

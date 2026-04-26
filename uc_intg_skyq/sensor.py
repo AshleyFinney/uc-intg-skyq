@@ -11,6 +11,7 @@ from ucapi import sensor
 from ucapi_framework import SensorEntity
 
 from uc_intg_skyq.config import SkyQDeviceConfig
+from uc_intg_skyq.const import DeviceState
 from uc_intg_skyq.device import SkyQDevice
 
 _LOG = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ class SkyQModelSensor(SensorEntity):
         self.subscribe_to_device(device)
 
     async def sync_state(self) -> None:
-        if self._device.state == "UNAVAILABLE":
+        if self._device.state == DeviceState.UNAVAILABLE:
             self.update({sensor.Attributes.STATE: sensor.States.UNAVAILABLE})
             return
         self.update({
@@ -67,7 +68,7 @@ class SkyQIPAddressSensor(SensorEntity):
         self.subscribe_to_device(device)
 
     async def sync_state(self) -> None:
-        if self._device.state == "UNAVAILABLE":
+        if self._device.state == DeviceState.UNAVAILABLE:
             self.update({sensor.Attributes.STATE: sensor.States.UNAVAILABLE})
             return
         self.update({
@@ -97,7 +98,7 @@ class SkyQChannelSensor(SensorEntity):
         self.subscribe_to_device(device)
 
     async def sync_state(self) -> None:
-        if self._device.state == "UNAVAILABLE":
+        if self._device.state == DeviceState.UNAVAILABLE:
             self.update({sensor.Attributes.STATE: sensor.States.UNAVAILABLE})
             return
         self.update({
@@ -127,7 +128,7 @@ class SkyQConnectionTypeSensor(SensorEntity):
         self.subscribe_to_device(device)
 
     async def sync_state(self) -> None:
-        if self._device.state == "UNAVAILABLE":
+        if self._device.state == DeviceState.UNAVAILABLE:
             self.update({sensor.Attributes.STATE: sensor.States.UNAVAILABLE})
             return
         self.update({
