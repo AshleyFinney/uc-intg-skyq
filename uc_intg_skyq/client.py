@@ -309,5 +309,5 @@ class _HttpChannel:
         self.channelno = data.get("c", "")
         self.channelname = data.get("t", "") or data.get("title", "")
         self.channelimageurl = None
-        self.channeltype = ""
+        self.channeltype = "Radio" if data.get("sf") == "au" else ""
         self.sid = data.get("sid", "")
