@@ -137,13 +137,13 @@ class SkyQMediaPlayer(MediaPlayerEntity):
             return False
 
         if media_id.startswith("channel_"):
-            channel_no = media_id[8:]
+            channel_no = media_id.removeprefix("channel_")
             if channel_no.isdigit():
                 return await self._device.cmd_change_channel(channel_no)
             return False
 
         if media_id.startswith("recording_"):
-            pvrid = media_id[10:]
+            pvrid = media_id.removeprefix("recording_")
             _LOG.info("[%s] Play recording: %s", self.id, pvrid)
             return await self._device.cmd_play_recording(pvrid)
 
