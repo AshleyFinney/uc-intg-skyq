@@ -5,7 +5,9 @@ SkyQ Integration Driver.
 :license: MPL-2.0, see LICENSE for more details.
 """
 
+import json
 import logging
+from pathlib import Path
 
 from ucapi_framework import BaseIntegrationDriver
 
@@ -22,6 +24,13 @@ from uc_intg_skyq.sensor import (
 
 _LOG = logging.getLogger(__name__)
 
+try:
+    _driver_path = Path(__file__).parent.parent / "driver.json"
+    with open(_driver_path, "r", encoding="utf-8") as _f:
+        _DRIVER_ID = json.load(_f).get("driver_id", "uc_intg_skyq")
+except (FileNotFoundError, json.JSONDecodeError):
+    _DRIVER_ID = "uc_intg_skyq"
+
 
 class SkyQDriver(BaseIntegrationDriver[SkyQDevice, SkyQDeviceConfig]):
     """Integration driver for SkyQ satellite boxes."""
@@ -37,6 +46,6 @@ class SkyQDriver(BaseIntegrationDriver[SkyQDevice, SkyQDeviceConfig]):
                 SkyQChannelSensor,
                 SkyQConnectionTypeSensor,
             ],
-            driver_id="uc_intg_skyq",
+            driver_id=_DRIVER_ID,
             require_connection_before_registry=False,
         )
