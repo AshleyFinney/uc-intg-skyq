@@ -31,7 +31,7 @@ _LOG = logging.getLogger(__name__)
 
 async def main() -> None:
     """Entry point for the SkyQ integration."""
-    level = os.getenv("UC_LOG_LEVEL", "DEBUG").upper()
+    level = os.getenv("UC_LOG_LEVEL", "INFO").upper()
     logging.basicConfig(
         level=getattr(logging, level, logging.DEBUG),
         format="%(asctime)s | %(levelname)-8s | %(name)-25s | %(message)s",
