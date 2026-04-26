@@ -45,6 +45,7 @@ class SkyQDevice(PollingDevice):
         self._hdr_capable: str = ""
         self._uhd_capable: str = ""
         self._system_uptime: str = ""
+        self._media_kind: str = ""
         self._background_tasks: set[asyncio.Task] = set()
 
     # -- PollingDevice interface -----------------------------------------------
@@ -170,6 +171,11 @@ class SkyQDevice(PollingDevice):
     @property
     def system_uptime(self) -> str:
         return self._system_uptime
+
+    @property
+    def media_kind(self) -> str:
+        """One of 'Live', 'Recording', 'App', or '' when nothing is playing."""
+        return self._media_kind
 
     # -- Commands --------------------------------------------------------------
 
@@ -370,6 +376,7 @@ class SkyQDevice(PollingDevice):
             self._media_title = ""
             self._media_image_url = ""
             self._current_channel = ""
+            self._media_kind = ""
             return
 
         self._state = DeviceState.PLAYING
@@ -379,6 +386,8 @@ class SkyQDevice(PollingDevice):
             self._media_title = program.get("title", "Live TV") or "Live TV"
             self._media_image_url = program.get("image_url", "") or ""
             self._current_channel = program.get("channel", "") or ""
+            self._media_kind = program.get("media_kind", "") or ""
         else:
             self._media_title = "Live TV"
             self._media_image_url = ""
+            self._media_kind = ""

@@ -184,3 +184,6 @@ SkyQSoftwareVersionSensor = _make_simple_sensor(
 SkyQHdrCapableSensor = _make_simple_sensor("hdr", "HDR Capable", "hdr_capable")
 SkyQUhdCapableSensor = _make_simple_sensor("uhd", "UHD Capable", "uhd_capable")
 SkyQUptimeSensor = _make_simple_sensor("uptime", "Uptime", "system_uptime")
+SkyQMediaKindSensor = _make_simple_sensor(
+    "media_kind", "Media Kind", "media_kind"
+)

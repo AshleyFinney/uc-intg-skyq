@@ -155,19 +155,35 @@ class SkyQClient:
 
             from uc_intg_skyq.const import APP_EPG
             if app_id != APP_EPG:
-                return {"title": app_title or "App", "image_url": None, "channel": None}
+                return {
+                    "title": app_title or "App",
+                    "image_url": None,
+                    "channel": None,
+                    "media_kind": "App",
+                }
 
             current_media = await asyncio.get_event_loop().run_in_executor(
                 None, self._skyq_remote.get_current_media
             )
             if not current_media:
-                return {"title": "Live TV", "image_url": None, "channel": None}
+                return {
+                    "title": "Live TV",
+                    "image_url": None,
+                    "channel": None,
+                    "media_kind": "",
+                }
 
             is_live = getattr(current_media, "live", False)
             sid = getattr(current_media, "sid", None)
+            media_kind = "Live" if is_live else "Recording"
 
             if not is_live or not sid:
-                return {"title": "Live TV", "image_url": None, "channel": None}
+                return {
+                    "title": "Live TV",
+                    "image_url": None,
+                    "channel": None,
+                    "media_kind": media_kind,
+                }
 
             programme = await asyncio.get_event_loop().run_in_executor(
                 None, self._skyq_remote.get_current_live_tv_programme, sid
@@ -187,7 +203,12 @@ class SkyQClient:
             elif title:
                 display_title = title
 
-            return {"title": display_title, "image_url": image_url, "channel": channel}
+            return {
+                "title": display_title,
+                "image_url": image_url,
+                "channel": channel,
+                "media_kind": media_kind,
+            }
 
         except Exception as err:
             _LOG.debug("EPG query failed: %s", err)
