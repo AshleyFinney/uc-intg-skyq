@@ -8,10 +8,9 @@
     "en": "Integration driver for SkyQ satellite boxes."
   },
   "developer": {
-    "name": "Meir Miyara",
-    "email": "meir.miyara@gmail.com"
+    "name": "Ashley Finney"
   },
-  "home_page": "https://github.com/mase1981/uc-intg-skyq",
+  "home_page": "https://github.com/AshleyFinney/uc-intg-skyq",
   "release_date": "2026-03-23",
   "setup_data_schema": {
     "title": { "en": "SkyQ Integration Setup" },
