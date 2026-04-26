@@ -125,14 +125,31 @@ class _ChannelLikeSelect(_SkyQSelectBase):
 
 
 class SkyQChannelsSelect(_ChannelLikeSelect):
-    """Select entity exposing the full Sky Q channel list for direct tuning."""
+    """Select entity exposing TV channels for direct tuning (excludes radio)."""
 
     def __init__(self, device_config: SkyQDeviceConfig, device: SkyQDevice) -> None:
         super().__init__(device_config, device, suffix="channels", label="Channels")
 
     async def _fetch_options(self) -> list[str]:
         items = await self._device.get_channel_list()
-        return [_format_channel_option(c) for c in items if _channel_no(c)]
+        return [
+            _format_channel_option(c) for c in items
+            if _channel_no(c) and getattr(c, "channeltype", "") != "audio"
+        ]
+
+
+class SkyQRadioSelect(_ChannelLikeSelect):
+    """Select entity exposing radio channels for direct tuning."""
+
+    def __init__(self, device_config: SkyQDeviceConfig, device: SkyQDevice) -> None:
+        super().__init__(device_config, device, suffix="radio", label="Radio")
+
+    async def _fetch_options(self) -> list[str]:
+        items = await self._device.get_channel_list()
+        return [
+            _format_channel_option(c) for c in items
+            if _channel_no(c) and getattr(c, "channeltype", "") == "audio"
+        ]
 
 
 class SkyQFavouritesSelect(_ChannelLikeSelect):

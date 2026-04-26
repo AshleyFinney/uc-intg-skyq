@@ -18,6 +18,7 @@ from uc_intg_skyq.remote import SkyQRemote
 from uc_intg_skyq.select import (
     SkyQChannelsSelect,
     SkyQFavouritesSelect,
+    SkyQRadioSelect,
     SkyQRecordingsSelect,
 )
 from uc_intg_skyq.sensor import (
@@ -52,6 +53,7 @@ class SkyQDriver(BaseIntegrationDriver[SkyQDevice, SkyQDeviceConfig]):
                 SkyQConnectionTypeSensor,
                 SkyQChannelsSelect,
                 SkyQFavouritesSelect,
+                SkyQRadioSelect,
                 SkyQRecordingsSelect,
             ],
             driver_id=_DRIVER_ID,
