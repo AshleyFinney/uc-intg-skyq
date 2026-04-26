@@ -5,6 +5,7 @@ SkyQ Media Browser for channels, favourites, and recordings.
 :license: MPL-2.0, see LICENSE for more details.
 """
 
+import asyncio
 import logging
 
 from ucapi import StatusCodes
@@ -51,7 +52,11 @@ async def search(device: SkyQDevice, options: SearchOptions) -> SearchResults | 
     query = options.query.lower()
     results: list[BrowseMediaItem] = []
 
-    channels = await device.get_channel_list()
+    channels, recordings = await asyncio.gather(
+        device.get_channel_list(),
+        device.get_recordings(),
+    )
+
     for ch in channels:
         name = getattr(ch, "channelname", "") or ""
         if query in name.lower():
@@ -65,7 +70,6 @@ async def search(device: SkyQDevice, options: SearchOptions) -> SearchResults | 
                 thumbnail=getattr(ch, "channelimageurl", None),
             ))
 
-    recordings = await device.get_recordings()
     for rec in recordings:
         title = getattr(rec, "title", "") or ""
         if query in title.lower():
@@ -92,7 +96,12 @@ async def search(device: SkyQDevice, options: SearchOptions) -> SearchResults | 
 async def _browse_root(device: SkyQDevice) -> BrowseResults:
     items: list[BrowseMediaItem] = []
 
-    channels = await device.get_channel_list()
+    channels, favourites, recordings = await asyncio.gather(
+        device.get_channel_list(),
+        device.get_favourite_list(),
+        device.get_recordings(),
+    )
+
     items.append(BrowseMediaItem(
         title="Channels",
         media_class=MediaClass.DIRECTORY,
@@ -102,7 +111,6 @@ async def _browse_root(device: SkyQDevice) -> BrowseResults:
         subtitle=f"{len(channels)} channels" if channels else "Browse channels",
     ))
 
-    favourites = await device.get_favourite_list()
     if favourites:
         items.append(BrowseMediaItem(
             title="Favourites",
@@ -113,7 +121,6 @@ async def _browse_root(device: SkyQDevice) -> BrowseResults:
             subtitle=f"{len(favourites)} favourites",
         ))
 
-    recordings = await device.get_recordings()
     if recordings:
         items.append(BrowseMediaItem(
             title="Recordings",
