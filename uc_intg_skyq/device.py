@@ -40,6 +40,11 @@ class SkyQDevice(PollingDevice):
         self._ip_address: str = device_config.host
         self._current_channel: str = ""
         self._connection_type: str = "not connected"
+        self._serial_number: str = ""
+        self._software_version: str = ""
+        self._hdr_capable: str = ""
+        self._uhd_capable: str = ""
+        self._system_uptime: str = ""
         self._background_tasks: set[asyncio.Task] = set()
 
     # -- PollingDevice interface -----------------------------------------------
@@ -145,6 +150,26 @@ class SkyQDevice(PollingDevice):
     @property
     def connection_type(self) -> str:
         return self._connection_type
+
+    @property
+    def serial_number(self) -> str:
+        return self._serial_number
+
+    @property
+    def software_version(self) -> str:
+        return self._software_version
+
+    @property
+    def hdr_capable(self) -> str:
+        return self._hdr_capable
+
+    @property
+    def uhd_capable(self) -> str:
+        return self._uhd_capable
+
+    @property
+    def system_uptime(self) -> str:
+        return self._system_uptime
 
     # -- Commands --------------------------------------------------------------
 
@@ -315,9 +340,19 @@ class SkyQDevice(PollingDevice):
             model = info.get("modelName") or info.get("hardwareModel", "SkyQ")
             device_name = info.get("deviceName", "")
             self._ip_address = self._device_config.host
+            self._serial_number = str(info.get("serialNumber", "") or "")
+            self._software_version = str(info.get("ASVersion", "") or "")
+            self._hdr_capable = str(info.get("hdrCapable", "") or "")
+            self._uhd_capable = str(info.get("uhdCapable", "") or "")
+            self._system_uptime = str(info.get("systemUptime", "") or "")
         else:
             model = getattr(info, "modelName", None) or getattr(info, "hardwareModel", "SkyQ")
             device_name = getattr(info, "deviceName", "")
+            self._serial_number = str(getattr(info, "serialNumber", "") or "")
+            self._software_version = str(getattr(info, "ASVersion", "") or "")
+            self._hdr_capable = str(getattr(info, "hdrCapable", "") or "")
+            self._uhd_capable = str(getattr(info, "uhdCapable", "") or "")
+            self._system_uptime = str(getattr(info, "systemUptime", "") or "")
         self._model = model or "SkyQ"
         if device_name and device_name.strip():
             self._device_name = device_name.strip()

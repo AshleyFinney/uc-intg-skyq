@@ -25,8 +25,13 @@ from uc_intg_skyq.select import (
 from uc_intg_skyq.sensor import (
     SkyQChannelSensor,
     SkyQConnectionTypeSensor,
+    SkyQHdrCapableSensor,
     SkyQIPAddressSensor,
     SkyQModelSensor,
+    SkyQSerialSensor,
+    SkyQSoftwareVersionSensor,
+    SkyQUhdCapableSensor,
+    SkyQUptimeSensor,
 )
 
 _LOG = logging.getLogger(__name__)
@@ -52,6 +57,11 @@ class SkyQDriver(BaseIntegrationDriver[SkyQDevice, SkyQDeviceConfig]):
                 SkyQIPAddressSensor,
                 SkyQChannelSensor,
                 SkyQConnectionTypeSensor,
+                SkyQSerialSensor,
+                SkyQSoftwareVersionSensor,
+                SkyQHdrCapableSensor,
+                SkyQUhdCapableSensor,
+                SkyQUptimeSensor,
                 SkyQAppsSelect,
                 SkyQChannelsSelect,
                 SkyQFavouritesSelect,
