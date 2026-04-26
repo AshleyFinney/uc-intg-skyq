@@ -81,8 +81,8 @@ Each SkyQ device creates several entities:
 #### **Comprehensive Button Support**
 Real SkyQ protocol implementation with confirmed working buttons:
 
-**Power Control** (4 commands):
-- **Power Toggle**, **Power On**, **Standby**, **Off** - Complete power management
+**Power Control** (3 commands):
+- **Power Toggle**, **Power On**, **Off** - Complete power management
 
 **Navigation** (8 commands):
 - **D-Pad**: Up, Down, Left, Right, Select - Menu navigation
@@ -94,7 +94,7 @@ Real SkyQ protocol implementation with confirmed working buttons:
 
 **Channel Control**:
 - **Number Pad** (0-9) + Select - Direct channel entry
-- **Channel Up** - Channel navigation
+- **Channel Up / Down** - Channel navigation
 - **Guide**, **Info** - Program information and TV guide
 
 **Volume Control** (3 commands):
@@ -138,8 +138,8 @@ Real SkyQ protocol implementation with confirmed working buttons:
 ## Installation
 
 ### Option 1: Remote Web Interface (Recommended)
-1. Navigate to the [**Fork Releases**](https://github.com/AshleyFinney/uc-intg-skyq/releases) page
-2. Download the latest `uc-intg-skyq-<version>-aarch64.tar.gz` file
+1. Open the [**latest release**](https://github.com/AshleyFinney/uc-intg-skyq/releases/latest)
+2. Download the `uc-intg-skyq-<version>-aarch64.tar.gz` asset
 3. Open your remote's web interface (`http://your-remote-ip`)
 4. Go to **Settings** → **Integrations** → **Add Integration**
 5. Click **Upload** and select the downloaded `.tar.gz` file
