@@ -12,7 +12,7 @@ from typing import Any
 
 import aiohttp
 
-from uc_intg_skyq.const import SKYQ_API_TIMEOUT, SKYQ_DIGIT_DELAY
+from uc_intg_skyq.const import SKYQ_API_TIMEOUT, SKYQ_DIGIT_DELAY, SKYQ_SELECT_DELAY
 
 _LOG = logging.getLogger(__name__)
 
@@ -238,7 +238,7 @@ class SkyQClient:
         digits = list(channel_number)
         if not await self.send_key_sequence(digits, delay=SKYQ_DIGIT_DELAY):
             return False
-        await asyncio.sleep(0.3)
+        await asyncio.sleep(SKYQ_SELECT_DELAY)
         return await self.send_remote_command("select")
 
     # -- Browsable content -----------------------------------------------------
