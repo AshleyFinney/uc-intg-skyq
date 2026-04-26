@@ -73,17 +73,17 @@ class _SkyQSelectBase(SelectEntity):
             self._device.state,
             len(self.select_options or []),
         )
+        # ucapi stores the entity object itself in configured_entities, not a
+        # copy — so configured_entity.attributes and self.attributes are the
+        # SAME dict. The framework's SelectEntity.set_attributes/set_state
+        # helpers mutate self.attributes BEFORE calling update(), which means
+        # filter_changed_attributes compares the new dict against itself,
+        # finds nothing changed, and silently skips the wire push. Bypass the
+        # helpers and call self.update({...fresh dict...}) so the filter has
+        # something to compare against.
         if self._device.state == DeviceState.UNAVAILABLE:
-            self.set_state(select.States.UNAVAILABLE, update=True)
+            self.update({select.Attributes.STATE: select.States.UNAVAILABLE})
             return
-        # Skip entirely when the entity isn't configured on the Remote yet.
-        # set_attributes mutates self.attributes regardless of whether the
-        # subsequent push goes through, and the framework copies self.attributes
-        # into the configured-entity baseline at subscription time. If we
-        # populate options locally before subscription, the baseline ends up
-        # pre-populated with the same data, and filter_changed_attributes
-        # discards every subsequent push as "unchanged" — so entity_change
-        # events never fire and the dropdown stays empty on the Remote.
         if not self._api.configured_entities.contains(self.id):
             _LOG.info("[%s] Not configured yet, skipping sync", self.id)
             return
@@ -93,10 +93,13 @@ class _SkyQSelectBase(SelectEntity):
                 options = await self._fetch_options()
             except Exception as err:
                 _LOG.warning("[%s] Failed to fetch options: %s", self.id, err)
-                self.set_state(select.States.UNKNOWN, update=True)
+                self.update({select.Attributes.STATE: select.States.UNKNOWN})
                 return
             _LOG.info("[%s] Loaded %d options from device", self.id, len(options))
-        self.set_attributes(state=select.States.ON, options=options, update=True)
+        self.update({
+            select.Attributes.STATE: select.States.ON,
+            select.Attributes.OPTIONS: options,
+        })
         _LOG.info("[%s] Pushed %d options to Remote", self.id, len(options))
 
     async def _handle_command(
@@ -127,7 +130,7 @@ class _ChannelLikeSelect(_SkyQSelectBase):
         channel_no = match.group(1)
         result = await self._device.cmd_change_channel(channel_no)
         if result:
-            self.set_current_option(option, update=True)
+            self.update({select.Attributes.CURRENT_OPTION: option})
         return StatusCodes.OK if result else StatusCodes.SERVER_ERROR
 
 
@@ -209,7 +212,7 @@ class SkyQAppsSelect(_SkyQSelectBase):
             return StatusCodes.BAD_REQUEST
         result = await self._device.cmd_launch_app(app_id)
         if result:
-            self.set_current_option(option, update=True)
+            self.update({select.Attributes.CURRENT_OPTION: option})
             _LOG.info("[%s] Launch reported success for %r", self.id, option)
             return StatusCodes.OK
         _LOG.warning(
@@ -243,5 +246,5 @@ class SkyQRecordingsSelect(_SkyQSelectBase):
             "[%s] Recording '%s' selected (informational only — Sky Q does not "
             "support remote-triggered recording playback)", self.id, option,
         )
-        self.set_current_option(option, update=True)
+        self.update({select.Attributes.CURRENT_OPTION: option})
         return StatusCodes.OK
