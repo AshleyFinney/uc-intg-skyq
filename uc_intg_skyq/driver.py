@@ -15,6 +15,11 @@ from uc_intg_skyq.config import SkyQDeviceConfig
 from uc_intg_skyq.device import SkyQDevice
 from uc_intg_skyq.media_player import SkyQMediaPlayer
 from uc_intg_skyq.remote import SkyQRemote
+from uc_intg_skyq.select import (
+    SkyQChannelsSelect,
+    SkyQFavouritesSelect,
+    SkyQRecordingsSelect,
+)
 from uc_intg_skyq.sensor import (
     SkyQChannelSensor,
     SkyQConnectionTypeSensor,
@@ -45,6 +50,9 @@ class SkyQDriver(BaseIntegrationDriver[SkyQDevice, SkyQDeviceConfig]):
                 SkyQIPAddressSensor,
                 SkyQChannelSensor,
                 SkyQConnectionTypeSensor,
+                SkyQChannelsSelect,
+                SkyQFavouritesSelect,
+                SkyQRecordingsSelect,
             ],
             driver_id=_DRIVER_ID,
             require_connection_before_registry=False,
