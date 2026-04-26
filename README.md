@@ -11,7 +11,7 @@ Control your SkyQ satellite boxes directly from your Unfolded Circle Remote 2 or
 
 This is a **personal fork** of [mase1981/uc-intg-skyq](https://github.com/mase1981/uc-intg-skyq), maintained for use on a single Sky Q **ES240** box. **Other Sky Q variants are explicitly not supported by this fork** — for broader hardware support, please use the upstream project instead.
 
-All credit for the original implementation goes to **[Meir Miyara](https://www.linkedin.com/in/meirmiyara)**, who built and continues to maintain the upstream integration. He's done a fantastic job creating it without owning a Sky Q box of his own — please [support his work](https://buymeacoffee.com/meirmiyara) if you find this integration useful:
+All credit for the original implementation goes to **[Meir Miyara](https://www.linkedin.com/in/meirmiyara)**, who built and continues to maintain the upstream integration. They've done a fantastic job creating it without owning a Sky Q box of their own — please [support their work](https://buymeacoffee.com/meirmiyara) if you find this integration useful:
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Meir%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/meirmiyara)
 [![PayPal](https://img.shields.io/badge/PayPal%20Meir-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/mmiyara)
@@ -217,7 +217,7 @@ When using multiple devices:
 
 ## Credits
 
-- **Original Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara) — created and maintains the upstream integration that this fork is based on. All architectural credit goes to him; this fork only carries small fixes and quality-of-life changes specific to ES240 use. Please [support his work](https://buymeacoffee.com/meirmiyara) if this integration is useful to you.
+- **Original Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara) — created and maintains the upstream integration that this fork is based on. All architectural credit goes to them; this fork only carries small fixes and quality-of-life changes specific to ES240 use. Please [support their work](https://buymeacoffee.com/meirmiyara) if this integration is useful to you.
 - **Upstream Project**: [mase1981/uc-intg-skyq](https://github.com/mase1981/uc-intg-skyq) — the source of this fork
 - **SkyQ**: Sky satellite TV platform
 - **Unfolded Circle**: Remote 2/3 integration framework (ucapi)
@@ -234,7 +234,7 @@ This project is licensed under the Mozilla Public License 2.0 (MPL-2.0) - see LI
 - **Fork Issues** (ES240-specific bugs in this fork): [AshleyFinney/uc-intg-skyq/issues](https://github.com/AshleyFinney/uc-intg-skyq/issues)
 - **Upstream Issues** (anything affecting non-ES240 boxes, or general bugs): [mase1981/uc-intg-skyq/issues](https://github.com/mase1981/uc-intg-skyq/issues)
 - **UC Community Forum**: [General discussion and support](https://unfolded.community/)
-- **Original Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara) — please direct thanks and donations to him, not the fork
+- **Original Developer**: [Meir Miyara](https://www.linkedin.com/in/meirmiyara) — please direct thanks and donations to them, not the fork
 - **Sky Support**: [Official Sky Support](https://www.sky.com/help)
 
 ---
