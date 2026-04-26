@@ -23,13 +23,37 @@ The upstream project is welcome to reference any changes in this fork.
 
 ## Differences from upstream
 
-User-facing fixes and improvements in this fork:
+User-facing fixes and improvements in this fork.
+
+### Bug fixes
 
 - **Digit buttons no longer send commands twice.** Pressing a number on a custom UI page used to send the digit immediately and then again ~2 seconds later, causing the box to re-tune to the same channel and triggering a phantom `OK` press at the end.
 - **Concurrent channel changes are now safe.** Two `channel_select:` activations firing close together (button mash, multiple activities firing in parallel) used to interleave their digit sequences and tune to an unpredictable channel; they're now serialized.
 - **Channel changes no longer block the UI.** The post-change state refresh runs in the background, so channel-up/down and `channel_select:` button presses feel snappier.
 - **Faster media browsing.** Channels, favourites, and recordings now load in parallel instead of sequentially.
 - **Radio channels show their "Radio" subtitle correctly.** The on-screen marker for radio stations was broken on all paths; it now appears as intended.
+- **Channel list always loads.** A subtitle empty-string was tripping the Remote's 1..255-character validation and silently dropping channels from the dropdown.
+- **Recordings list no longer pretends to be playable.** Sky Q deliberately blocks external recording playback (no REST endpoint, UPnP transport returns "TRANSPORT IS LOCKED", no IRCC code for the planner button), so the browser entry now correctly shows `can_play=false`.
+- **Shuffle / Repeat transport buttons no longer pop a 500 error on press.** Sky Q has no shuffle or repeat concept, so these buttons accept-and-ignore now instead of erroring.
+
+### New entities
+
+- **Four Select dropdown widgets**, each rendering as an independent home-screen entry:
+  - **Channels** — full TV-channel list with one-tap tuning
+  - **Radio** — split out from Channels so radio stations have their own dropdown
+  - **Favourites** — your Sky Q favourites list with one-tap tuning
+  - **Recordings** — informational list of all recordings (selection has no action because Sky Q locks down playback)
+- **Six new sensors:** Serial Number, Software Version, HDR Capable, UHD Capable, Uptime (formatted as `Xh Ym` / `Xd Yh Zm`), and Media Kind (`Live` / `Recording` / `App`).
+- **Recordings grouped by series in the media browser.** Multi-episode shows collapse into folders and drilling in lists episodes labelled `S01E01`, `S01E02`... sorted by season → episode → air date. Single-recording titles stay as flat leaves at the top level.
+
+### Caveats
+
+- **Apps launching is impossible on Sky Q.** Sky Q has no programmatic app-launch endpoint — verified against pyskyqremote, the Roger Selwyn HA integration, pyskyq, sky-remote, go-skyremote, alexa-sky-hd, plus a direct probe of the box's REST API (every endpoint returned 404). The class is retained in the codebase as a record of what was tried but is not registered. Use the Remote's button mappings to launch apps via menu navigation if needed.
+- **Recordings can only be browsed, not played remotely.** Cross-confirmed against the same six sources plus Sky's own first-party app — no path exists to play a specific recording from outside the box's UI.
+
+### Note on uptime
+
+The Uptime sensor reads Sky Q's `systemUptime` field, which is the time since the box last woke from deep standby — *not* since the last full power cycle. So it typically reads in hours rather than days or weeks, by Sky's design.
 
 For the full commit log including internal cleanups, see [the main branch](https://github.com/AshleyFinney/uc-intg-skyq/commits/main).
 
@@ -46,8 +70,11 @@ This integration provides full remote control of your Sky Q satellite box direct
 - **Single Tested Model** - This fork is only tested on **ES240**. The upstream integration supports other variants (ES130, ES200, etc.) — use it instead if you have one of those.
 
 #### **Per-Device Entities**
-Each SkyQ device creates one remote entity:
-- **Remote Entity**: `[Device Name] Remote ([Model])` - Full remote control with on-screen interface
+Each SkyQ device creates several entities:
+- **Remote**: Full button control with 4 UI pages
+- **Media Player**: Playback transport, source list, browse view (with series-grouped recordings, channel logos, thumbnails)
+- **Selects**: Channels, Radio, Favourites, Recordings — independent dropdown widgets
+- **Sensors**: Model, IP, Serial, Software Version, HDR / UHD capable, Uptime, Channel, Connection Type, Media Kind
 
 ### 🎮 **Remote Control Functionality**
 
