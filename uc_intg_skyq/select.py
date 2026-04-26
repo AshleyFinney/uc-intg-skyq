@@ -76,6 +76,17 @@ class _SkyQSelectBase(SelectEntity):
         if self._device.state == DeviceState.UNAVAILABLE:
             self.set_state(select.States.UNAVAILABLE, update=True)
             return
+        # Skip entirely when the entity isn't configured on the Remote yet.
+        # set_attributes mutates self.attributes regardless of whether the
+        # subsequent push goes through, and the framework copies self.attributes
+        # into the configured-entity baseline at subscription time. If we
+        # populate options locally before subscription, the baseline ends up
+        # pre-populated with the same data, and filter_changed_attributes
+        # discards every subsequent push as "unchanged" — so entity_change
+        # events never fire and the dropdown stays empty on the Remote.
+        if not self._api.configured_entities.contains(self.id):
+            _LOG.info("[%s] Not configured yet, skipping sync", self.id)
+            return
         options = self.select_options
         if not options:
             try:
@@ -85,10 +96,6 @@ class _SkyQSelectBase(SelectEntity):
                 self.set_state(select.States.UNKNOWN, update=True)
                 return
             _LOG.info("[%s] Loaded %d options from device", self.id, len(options))
-        # Always push state+options so a newly-configured entity gets data on
-        # the next poll cycle (the framework no-ops update for unconfigured
-        # entities, so the local cache could otherwise stay stuck on the
-        # Remote even after the user adds the widget).
         self.set_attributes(state=select.States.ON, options=options, update=True)
         _LOG.info("[%s] Pushed %d options to Remote", self.id, len(options))
 
