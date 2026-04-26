@@ -27,14 +27,14 @@ User-facing fixes and improvements in this fork.
 
 ### Bug fixes
 
-- **Digit buttons no longer send commands twice.** Pressing a number on a custom UI page used to send the digit immediately and then again ~2 seconds later, causing the box to re-tune to the same channel and triggering a phantom `OK` press at the end.
-- **Concurrent channel changes are now safe.** Two `channel_select:` activations firing close together (button mash, multiple activities firing in parallel) used to interleave their digit sequences and tune to an unpredictable channel; they're now serialized.
-- **Channel changes no longer block the UI.** The post-change state refresh runs in the background, so channel-up/down and `channel_select:` button presses feel snappier.
-- **Faster media browsing.** Channels, favourites, and recordings now load in parallel instead of sequentially.
-- **Radio channels show their "Radio" subtitle correctly.** The on-screen marker for radio stations was broken on all paths; it now appears as intended.
-- **Channel list always loads.** A subtitle empty-string was tripping the Remote's 1..255-character validation and silently dropping channels from the dropdown.
-- **Recordings list no longer pretends to be playable.** Sky Q deliberately blocks external recording playback (no REST endpoint, UPnP transport returns "TRANSPORT IS LOCKED", no IRCC code for the planner button), so the browser entry now correctly shows `can_play=false`.
-- **Shuffle / Repeat transport buttons no longer pop a 500 error on press.** Sky Q has no shuffle or repeat concept, so these buttons accept-and-ignore now instead of erroring.
+- **Digit buttons no longer fire twice.** Number presses on custom UI pages no longer double-trigger or end with a phantom `OK`.
+- **Concurrent channel changes are safe.** Mashing channel buttons or overlapping `channel_select:` activations no longer tunes to an unpredictable channel.
+- **Channel changes feel snappier.** Channel-up/down and `channel_select:` presses no longer block the UI.
+- **Faster media browsing.** Channels, favourites, and recordings load in parallel.
+- **Radio channels display their "Radio" subtitle correctly.**
+- **Channel dropdown is reliable.** Channels no longer go silently missing from the list.
+- **Recordings list is honest about playback.** The recordings entry no longer claims to be playable — see the recordings caveat below.
+- **Shuffle / Repeat buttons no longer pop an error toast.** Tapping them silently does nothing now, since Sky Q has no shuffle/repeat concept.
 
 ### New entities
 
@@ -42,18 +42,18 @@ User-facing fixes and improvements in this fork.
   - **Channels** — full TV-channel list with one-tap tuning
   - **Radio** — split out from Channels so radio stations have their own dropdown
   - **Favourites** — your Sky Q favourites list with one-tap tuning
-  - **Recordings** — informational list of all recordings (selection has no action because Sky Q locks down playback)
+  - **Recordings** — informational list of all recordings
 - **Six new sensors:** Serial Number, Software Version, HDR Capable, UHD Capable, Uptime (formatted as `Xh Ym` / `Xd Yh Zm`), and Media Kind (`Live` / `Recording` / `App`).
-- **Recordings grouped by series in the media browser.** Multi-episode shows collapse into folders and drilling in lists episodes labelled `S01E01`, `S01E02`... sorted by season → episode → air date. Single-recording titles stay as flat leaves at the top level.
+- **Recordings grouped by series in the media browser.** Multi-episode shows collapse into folders and drilling in lists episodes as `S01E01`, `S01E02`… sorted by season → episode → air date. Single-recording titles stay as flat items at the top level.
 
 ### Caveats
 
-- **Apps launching is impossible on Sky Q.** Sky Q has no programmatic app-launch endpoint — verified against pyskyqremote, the Roger Selwyn HA integration, pyskyq, sky-remote, go-skyremote, alexa-sky-hd, plus a direct probe of the box's REST API (every endpoint returned 404). The class is retained in the codebase as a record of what was tried but is not registered. Use the Remote's button mappings to launch apps via menu navigation if needed.
-- **Recordings can only be browsed, not played remotely.** Cross-confirmed against the same six sources plus Sky's own first-party app — no path exists to play a specific recording from outside the box's UI.
+- **Apps cannot be launched programmatically on Sky Q.** The box exposes no app-launch endpoint, so there's no Apps dropdown. Use the Remote's button mappings to navigate the on-screen apps menu if you need to launch one.
+- **Recordings can only be browsed, not played remotely.** Sky Q doesn't expose a way to start playback of a specific recording from outside the box's UI.
 
 ### Note on uptime
 
-The Uptime sensor reads Sky Q's `systemUptime` field, which is the time since the box last woke from deep standby — *not* since the last full power cycle. So it typically reads in hours rather than days or weeks, by Sky's design.
+The Uptime sensor reads Sky Q's `systemUptime` field, which counts time since the box last woke from deep standby — *not* since the last full power cycle. So it typically reads in hours rather than days or weeks, by Sky's design.
 
 For the full commit log including internal cleanups, see [the main branch](https://github.com/AshleyFinney/uc-intg-skyq/commits/main).
 
