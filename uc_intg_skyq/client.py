@@ -232,6 +232,83 @@ class SkyQClient:
                 await asyncio.sleep(delay)
         return True
 
+    async def get_app_list(self) -> list[dict]:
+        """Return the full list of installed apps as dicts with appId/title/status."""
+        if self._skyq_remote and self._skyq_remote.device_setup:
+            try:
+                data = await asyncio.get_event_loop().run_in_executor(
+                    None, self._skyq_remote._device_access.retrieve_information, "apps"
+                )
+                if data and "apps" in data:
+                    apps = data["apps"]
+                    _LOG.info("get_app_list: pyskyqremote returned %d apps", len(apps))
+                    return apps
+                _LOG.warning("get_app_list: pyskyqremote returned no apps payload")
+            except Exception as err:
+                _LOG.warning("pyskyqremote get_app_list failed: %s", err)
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                url = f"http://{self._host}:{self._rest_port}/as/apps"
+                async with session.get(
+                    url, timeout=aiohttp.ClientTimeout(total=SKYQ_API_TIMEOUT)
+                ) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        apps = data.get("apps", [])
+                        _LOG.info("get_app_list: HTTP fallback returned %d apps", len(apps))
+                        return apps
+                    _LOG.warning("get_app_list: HTTP fallback returned status %d", resp.status)
+        except Exception as err:
+            _LOG.warning("get_app_list HTTP fallback failed: %s", err)
+        return []
+
+    async def launch_app(self, app_id: str) -> bool:
+        """
+        Attempt to launch an app on the Sky Q box by appId.
+
+        Sky Q does not document an app-launch API, and pyskyqremote doesn't
+        expose one. Try several plausible HTTP patterns and log everything so
+        we can see what (if anything) the box accepts. Returns True on the
+        first attempt that returns a 2xx status.
+        """
+        _LOG.info("launch_app: starting attempts for appId=%r host=%s", app_id, self._host)
+        base = f"http://{self._host}:{self._rest_port}/as/apps"
+        attempts = [
+            ("POST", f"{base}/{app_id}", None),
+            ("POST", f"{base}/launch", {"appId": app_id}),
+            ("POST", f"{base}/{app_id}/launch", None),
+            ("PUT", f"{base}/active", {"appId": app_id}),
+            ("POST", f"{base}/active", {"appId": app_id}),
+            ("POST", base, {"appId": app_id}),
+        ]
+        async with aiohttp.ClientSession() as session:
+            for method, url, body in attempts:
+                _LOG.info("launch_app: trying %s %s body=%s", method, url, body)
+                try:
+                    request_kwargs = {
+                        "timeout": aiohttp.ClientTimeout(total=SKYQ_API_TIMEOUT),
+                    }
+                    if body is not None:
+                        request_kwargs["json"] = body
+                    request_func = session.post if method == "POST" else session.put
+                    async with request_func(url, **request_kwargs) as resp:
+                        body_text = await resp.text()
+                        _LOG.info(
+                            "launch_app: %s %s -> status=%d body=%r",
+                            method, url, resp.status, body_text[:200],
+                        )
+                        if 200 <= resp.status < 300:
+                            _LOG.info(
+                                "launch_app: SUCCESS appId=%s via %s %s",
+                                app_id, method, url,
+                            )
+                            return True
+                except Exception as err:
+                    _LOG.info("launch_app: %s %s raised %s", method, url, err)
+        _LOG.warning("launch_app: all %d attempts failed for %r", len(attempts), app_id)
+        return False
+
     async def play_recording(self, pvrid: str) -> bool:
         try:
             async with aiohttp.ClientSession() as session:

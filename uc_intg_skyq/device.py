@@ -293,6 +293,16 @@ class SkyQDevice(PollingDevice):
             return []
         return await self._client.get_recordings()
 
+    async def get_apps(self) -> list[dict]:
+        if not self._client:
+            return []
+        return await self._client.get_app_list()
+
+    async def cmd_launch_app(self, app_id: str) -> bool:
+        if not self._client:
+            return False
+        return await self._client.launch_app(app_id)
+
     # -- Internal methods ------------------------------------------------------
 
     async def _fetch_device_info(self) -> None:

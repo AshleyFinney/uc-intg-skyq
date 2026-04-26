@@ -170,6 +170,56 @@ class SkyQFavouritesSelect(_ChannelLikeSelect):
         return [_format_channel_option(f) for f in items if _channel_no(f)]
 
 
+class SkyQAppsSelect(_SkyQSelectBase):
+    """
+    Select entity exposing installed Sky Q apps for launch (experimental).
+
+    pyskyqremote can read installed apps and detect the active one but does
+    not expose a launch API — Sky Q's HTTP launch endpoint is undocumented.
+    On select_option we try a handful of plausible HTTP patterns; whichever
+    (if any) the box accepts is logged at INFO level. Worst case: we discover
+    Sky Q rejects all of them and the select becomes informational.
+    """
+
+    def __init__(self, device_config: SkyQDeviceConfig, device: SkyQDevice) -> None:
+        super().__init__(device_config, device, suffix="apps", label="Apps")
+        self._title_to_app_id: dict[str, str] = {}
+
+    async def _fetch_options(self) -> list[str]:
+        apps = await self._device.get_apps()
+        self._title_to_app_id = {
+            a.get("title"): a.get("appId")
+            for a in apps
+            if a.get("title") and a.get("appId")
+        }
+        titles = sorted(self._title_to_app_id.keys(), key=str.lower)
+        _LOG.info(
+            "[%s] Built app map: %d apps, sample appIds: %s",
+            self.id, len(titles), list(self._title_to_app_id.values())[:3],
+        )
+        return titles
+
+    async def _handle_select_option(self, option: str) -> StatusCodes:
+        app_id = self._title_to_app_id.get(option)
+        _LOG.info(
+            "[%s] select_option: title=%r → appId=%r (cache size=%d)",
+            self.id, option, app_id, len(self._title_to_app_id),
+        )
+        if not app_id:
+            return StatusCodes.BAD_REQUEST
+        result = await self._device.cmd_launch_app(app_id)
+        if result:
+            self.set_current_option(option, update=True)
+            _LOG.info("[%s] Launch reported success for %r", self.id, option)
+            return StatusCodes.OK
+        _LOG.warning(
+            "[%s] Launch failed for title=%r appId=%s — Sky Q likely doesn't "
+            "expose a launch API on this firmware",
+            self.id, option, app_id,
+        )
+        return StatusCodes.SERVER_ERROR
+
+
 class SkyQRecordingsSelect(_SkyQSelectBase):
     """
     Select entity exposing recordings as an informational list.
