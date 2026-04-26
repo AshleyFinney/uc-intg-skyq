@@ -35,6 +35,7 @@ async def main() -> None:
     logging.basicConfig(
         level=getattr(logging, level, logging.DEBUG),
         format="%(asctime)s | %(levelname)-8s | %(name)-25s | %(message)s",
+        force=True,
     )
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
     logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
