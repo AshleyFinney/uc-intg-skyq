@@ -56,37 +56,6 @@ async def browse(device: SkyQDevice, options: BrowseOptions) -> BrowseResults | 
     return StatusCodes.NOT_FOUND
 
 
-async def browse_recordings_root(
-    device: SkyQDevice, options: BrowseOptions
-) -> BrowseResults | StatusCodes:
-    """Entry point for the dedicated recordings-only MediaPlayer entity.
-
-    Treats the recordings grouped tree as the root (no device-level wrapper).
-    """
-    media_type = options.media_type or MEDIA_TYPE_RECORDINGS
-    media_id = options.media_id or ""
-
-    if media_type == MEDIA_TYPE_SERIES or media_id.startswith(SERIES_ID_PREFIX):
-        return await _browse_series(device, options)
-
-    return await _browse_recordings(device, options)
-
-
-async def search_recordings(device: SkyQDevice, options: SearchOptions) -> SearchResults:
-    """Search restricted to recordings — flat results, no series grouping."""
-    query = options.query.lower()
-    recordings = await device.get_recordings()
-    results: list[BrowseMediaItem] = []
-    for rec in recordings:
-        title = getattr(rec, "title", "") or ""
-        if query in title.lower():
-            results.append(_recording_leaf(rec))
-    return SearchResults(
-        media=results,
-        pagination=Pagination(page=1, limit=len(results), count=len(results)),
-    )
-
-
 async def search(device: SkyQDevice, options: SearchOptions) -> SearchResults | StatusCodes:
     query = options.query.lower()
     results: list[BrowseMediaItem] = []
