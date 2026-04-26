@@ -26,6 +26,7 @@ class SkyQClient:
         self._remote_port = remote_port
         self._skyq_remote: Any = None
         self._http_fallback = False
+        self._channel_change_lock = asyncio.Lock()
 
     @property
     def host(self) -> str:
@@ -235,11 +236,12 @@ class SkyQClient:
         return await self.send_remote_command("planner")
 
     async def change_channel(self, channel_number: str) -> bool:
-        digits = list(channel_number)
-        if not await self.send_key_sequence(digits, delay=SKYQ_DIGIT_DELAY):
-            return False
-        await asyncio.sleep(SKYQ_SELECT_DELAY)
-        return await self.send_remote_command("select")
+        async with self._channel_change_lock:
+            digits = list(channel_number)
+            if not await self.send_key_sequence(digits, delay=SKYQ_DIGIT_DELAY):
+                return False
+            await asyncio.sleep(SKYQ_SELECT_DELAY)
+            return await self.send_remote_command("select")
 
     # -- Browsable content -----------------------------------------------------
 
