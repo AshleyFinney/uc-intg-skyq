@@ -40,6 +40,7 @@ class SkyQDevice(PollingDevice):
         self._ip_address: str = device_config.host
         self._current_channel: str = ""
         self._connection_type: str = "not connected"
+        self._background_tasks: set[asyncio.Task] = set()
 
     # -- PollingDevice interface -----------------------------------------------
 
@@ -203,9 +204,7 @@ class SkyQDevice(PollingDevice):
             return False
         result = await self._client.send_remote_command("channelup")
         if result:
-            await asyncio.sleep(2)
-            await self._update_player_state()
-            self.push_update()
+            self._schedule_state_refresh(2)
         return result
 
     async def cmd_previous(self) -> bool:
@@ -213,9 +212,7 @@ class SkyQDevice(PollingDevice):
             return False
         result = await self._client.send_remote_command("channeldown")
         if result:
-            await asyncio.sleep(2)
-            await self._update_player_state()
-            self.push_update()
+            self._schedule_state_refresh(2)
         return result
 
     async def cmd_fast_forward(self) -> bool:
@@ -263,10 +260,21 @@ class SkyQDevice(PollingDevice):
             return False
         result = await self._client.change_channel(channel)
         if result:
-            await asyncio.sleep(2)
+            self._schedule_state_refresh(2)
+        return result
+
+    def _schedule_state_refresh(self, delay: float) -> None:
+        task = asyncio.create_task(self._refresh_state_after(delay))
+        self._background_tasks.add(task)
+        task.add_done_callback(self._background_tasks.discard)
+
+    async def _refresh_state_after(self, delay: float) -> None:
+        await asyncio.sleep(delay)
+        try:
             await self._update_player_state()
             self.push_update()
-        return result
+        except Exception as err:
+            _LOG.debug("[%s] Post-change state refresh failed: %s", self.log_id, err)
 
     # -- Browsable content -----------------------------------------------------
 
